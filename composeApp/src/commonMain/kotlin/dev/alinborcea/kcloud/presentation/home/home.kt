@@ -2,6 +2,7 @@ package dev.alinborcea.kcloud.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,15 +12,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -64,14 +75,70 @@ val dummyWeather = WeatherResponse(
 
 @Composable
 fun HomePage() {
+    var searchQuery by remember { mutableStateOf("Curtici") }
+
     Column(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .safeContentPadding()
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .fillMaxSize()
+            .statusBarsPadding() // Ensures it doesn't overlap with phone clock/icons
     ) {
+        WeatherSearchBar(
+            query = "Curtici",
+            onQueryChange = { searchQuery = it },
+            onSearch = { city ->
+                // Trigger your Ktor API call here
+                println("Searching for: $city")
+            }
+        )
+
+        // Your amazing card from before
         WeatherSummaryCard(data = dummyWeather)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WeatherSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var active by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
+            query = query,
+            onQueryChange = onQueryChange,
+            onSearch = {
+                active = false
+                onSearch(it)
+            },
+            active = active,
+            onActiveChange = { active = it },
+            placeholder = { Text("Search city (e.g. London)") },
+            //leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = {
+                if (active && query.isNotEmpty()) {
+                    TextButton(onClick = { onQueryChange("") }) {
+                    Text("Search")
+                    //Icon(Icons.Default.Close, contentDescription = "Clear")
+                    }
+                }
+            },
+            shape = RoundedCornerShape(28.dp),
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            // Optional: Add search history or suggestions here
+            // Text("London, UK", modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
