@@ -15,6 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -122,12 +127,11 @@ fun WeatherSearchBar(
             active = active,
             onActiveChange = { active = it },
             placeholder = { Text("Search city (e.g. London)") },
-            //leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             trailingIcon = {
                 if (active && query.isNotEmpty()) {
                     TextButton(onClick = { onQueryChange("") }) {
-                    Text("Search")
-                    //Icon(Icons.Default.Close, contentDescription = "Clear")
+                    Icon(Icons.Default.Close, contentDescription = "Clear")
                     }
                 }
             },
@@ -237,12 +241,12 @@ fun WeatherSummaryCard(
                 WeatherDetailItem(
                     label = "Wind",
                     value = "${data.current.windKph} km/h",
-                    //icon = Icons.Default.Air // If using Material Icons
+                    icon = Icons.Default.Air // If using Material Icons
                 )
                 WeatherDetailItem(
                     label = "Humidity",
                     value = "${data.current.humidity}%",
-                    //icon = Icons.Default.WaterDrop
+                    icon = Icons.Default.WaterDrop
                 )
             }
         }
@@ -253,15 +257,15 @@ fun WeatherSummaryCard(
 fun WeatherDetailItem(
     label: String,
     value: String,
-    //icon: ImageVector
+    icon: ImageVector
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        /*Icon(
+        Icon(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
-        )*/
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,

@@ -47,8 +47,7 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
-            implementation(compose.components.resources)
-            //implementation(org.jetbrains.compose.components:components-resources)
+            implementation(compose.materialIconsExtended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
