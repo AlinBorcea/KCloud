@@ -1,9 +1,12 @@
 package dev.alinborcea.kcloud.presentation.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,12 +17,20 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Compress
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Umbrella
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.WindPower
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.domain.models.Condition
 import dev.alinborcea.kcloud.domain.models.Current
+import dev.alinborcea.kcloud.domain.models.ForecastDay
 import dev.alinborcea.kcloud.domain.models.Location
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
@@ -85,6 +97,7 @@ fun HomePage() {
     val weather = WeatherAPI()
 
     var weatherInfo by remember { mutableStateOf(dummyWeather) }
+    var forecast by remember { mutableStateOf(WeatherResponse()) }
 
     Column(
         modifier = Modifier
@@ -98,6 +111,7 @@ fun HomePage() {
                 runBlocking {
                     try {
                         weatherInfo = weather.getWeatherAt(city)
+                        forecast = weather.getWeatherForecast(city, 2)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -108,6 +122,7 @@ fun HomePage() {
 
         // Your amazing card from before
         WeatherSummaryCard(data = weatherInfo)
+        ForecastSection(forecast.forecast.forecastDay)
     }
 }
 
@@ -161,10 +176,13 @@ fun WeatherSummaryCard(
     data: WeatherResponse,
     modifier: Modifier = Modifier
 ) {
+    var extraInfoExpanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { extraInfoExpanded = !extraInfoExpanded },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -259,6 +277,125 @@ fun WeatherSummaryCard(
                     icon = Icons.Default.WaterDrop
                 )
             }
+            // --- Expandable Section: Remaining Data ---
+            AnimatedVisibility(visible = extraInfoExpanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // First row of extra details
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        WeatherDetailItem(
+                            label = "Pressure",
+                            value = "${data.current.pressureMb} hPa",
+                            icon = Icons.Default.Compress
+                        )
+                        WeatherDetailItem(
+                            label = "UV Index",
+                            value = "${data.current.uv}",
+                            icon = Icons.Default.WbSunny
+                        )
+                        WeatherDetailItem(
+                            label = "Visibility",
+                            value = "${data.current.visKm} km",
+                            icon = Icons.Default.Visibility
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Second row of extra details
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        WeatherDetailItem(
+                            label = "Cloud",
+                            value = "${data.current.cloud}%",
+                            icon = Icons.Default.Cloud
+                        )
+                        WeatherDetailItem(
+                            label = "Rain Chance",
+                            value = "${data.current.chanceOfRain}%",
+                            icon = Icons.Default.Umbrella
+                        )
+                        WeatherDetailItem(
+                            label = "Gusts",
+                            value = "${data.current.gustKph} kph",
+                            icon = Icons.Default.WindPower
+                        )
+                    }
+                }
+            }
+            //ForecastSection()
+        }
+    }
+}
+
+@Composable
+fun ForecastSection(forecastDays: List<ForecastDay>) {
+    Column(modifier = Modifier.padding(top = 8.dp)) {
+        Text(
+            text = "7-Day Forecast",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(forecastDays) { day ->
+                ForecastItem(day)
+            }
+        }
+    }
+}
+
+@Composable
+fun ForecastItem(forecastDay: ForecastDay) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        modifier = Modifier.width(100.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Helper to get day name (e.g., "Mon") from "2023-10-25"
+            Text(
+                text = forecastDay.date.takeLast(5), // Simple slice for now
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Icon Placeholder (You can use Coil or KMP library to load the URL)
+            Icon(
+                imageVector = Icons.Default.Cloud,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "${forecastDay.day.maxTempC.toInt()}°",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "${forecastDay.day.minTempC.toInt()}°",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
