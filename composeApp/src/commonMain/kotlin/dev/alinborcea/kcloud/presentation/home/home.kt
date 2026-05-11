@@ -80,8 +80,6 @@ val dummyWeather = WeatherResponse(
 
 @Composable
 fun HomePage() {
-    var searchQuery by remember { mutableStateOf("Curtici") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,7 +87,6 @@ fun HomePage() {
     ) {
         WeatherSearchBar(
             query = "Curtici",
-            onQueryChange = { searchQuery = it },
             onSearch = { city ->
                 // Trigger your Ktor API call here
                 println("Searching for: $city")
@@ -105,11 +102,11 @@ fun HomePage() {
 @Composable
 fun WeatherSearchBar(
     query: String,
-    onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var active by remember { mutableStateOf(false) }
+    var locationQuery by remember { mutableStateOf(query) }
 
     Box(
         modifier = modifier
@@ -118,8 +115,8 @@ fun WeatherSearchBar(
     ) {
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
-            query = query,
-            onQueryChange = onQueryChange,
+            query = locationQuery,
+            onQueryChange = { locationQuery = it },
             onSearch = {
                 active = false
                 onSearch(it)
@@ -130,8 +127,8 @@ fun WeatherSearchBar(
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             trailingIcon = {
                 if (active && query.isNotEmpty()) {
-                    TextButton(onClick = { onQueryChange("") }) {
-                    Icon(Icons.Default.Close, contentDescription = "Clear")
+                    TextButton(onClick = { active = false }) {
+                        Icon(Icons.Default.Close, contentDescription = "Clear")
                     }
                 }
             },
