@@ -1,7 +1,6 @@
 package dev.alinborcea.kcloud.presentation.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -54,64 +52,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
-import dev.alinborcea.kcloud.domain.models.Condition
-import dev.alinborcea.kcloud.domain.models.Current
 import dev.alinborcea.kcloud.domain.models.ForecastDay
-import dev.alinborcea.kcloud.domain.models.Location
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
-
-val dummyWeather = WeatherResponse(
-    location = Location(
-        name = "Paris",
-        region = "Ile-de-France",
-        country = "France",
-        lat = 48.8566,
-        lon = 2.3522,
-        tzId = "Europe/Paris",
-        localtimeEpoch = 1715414400L,
-        localtime = "2026-05-11 10:30"
-    ),
-    current = Current(
-        tempC = 22.0,
-        tempF = 71.6,
-        isDay = 1,
-        condition = Condition(
-            text = "Partly Cloudy",
-            icon = "//cdn.weatherapi.com/weather/64x64/day/116.png",
-            code = 1003
-        ),
-        windKph = 15.0,
-        windMph = 9.3,
-        humidity = 45,
-        feelslikeC = 21.5,
-        feelslikeF = 70.7,
-        uv = 5.0,
-        visKm = 10.0,
-        pressureMb = 1012.0
-    )
-)
 
 @Composable
 fun HomePage() {
     val weather = WeatherAPI()
 
-    var weatherInfo by remember { mutableStateOf(dummyWeather) }
+    var weatherInfo by remember { mutableStateOf(WeatherResponse()) }
     var forecast by remember { mutableStateOf(WeatherResponse()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding() // Ensures it doesn't overlap with phone clock/icons
+            .statusBarsPadding()
     ) {
         WeatherSearchBar(
-            query = "Curtici",
+            query = "",
             onSearch = { city ->
-                // Trigger your Ktor API call here
                 runBlocking {
                     try {
                         weatherInfo = weather.getWeatherAt(city)
-                        forecast = weather.getWeatherForecast(city, 2)
+                        forecast = weather.getWeatherForecast(city, 4)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -120,7 +83,6 @@ fun HomePage() {
             }
         )
 
-        // Your amazing card from before
         WeatherSummaryCard(data = weatherInfo)
         ForecastSection(forecast.forecast.forecastDay)
     }
@@ -165,8 +127,7 @@ fun WeatherSearchBar(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
-            // Optional: Add search history or suggestions here
-            // Text("London, UK", modifier = Modifier.padding(16.dp))
+            //Favourite locations
         }
     }
 }
@@ -329,7 +290,6 @@ fun WeatherSummaryCard(
                     }
                 }
             }
-            //ForecastSection()
         }
     }
 }
@@ -338,7 +298,7 @@ fun WeatherSummaryCard(
 fun ForecastSection(forecastDays: List<ForecastDay>) {
     Column(modifier = Modifier.padding(top = 8.dp)) {
         Text(
-            text = "7-Day Forecast",
+            text = "Forecast",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
