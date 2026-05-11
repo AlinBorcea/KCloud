@@ -6,7 +6,26 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WeatherResponse(
     val location: Location = Location(),
-    val current: Current = Current()
+    val current: Current = Current(),
+    val forecast: Forecast = Forecast()
+)
+
+@Serializable
+data class Forecast(
+    @SerialName("forecastday") val forecastDay: List<ForecastDay> = emptyList()
+)
+
+@Serializable
+data class ForecastDay(
+    val date: String = "",
+    val day: Day = Day()
+)
+
+@Serializable
+data class Day(
+    @SerialName("maxtemp_c") val maxTempC: Double = 0.0,
+    @SerialName("mintemp_c") val minTempC: Double = 0.0,
+    val condition: Condition = Condition()
 )
 
 @Serializable
