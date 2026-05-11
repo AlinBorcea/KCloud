@@ -42,10 +42,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.domain.models.Condition
 import dev.alinborcea.kcloud.domain.models.Current
 import dev.alinborcea.kcloud.domain.models.Location
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
+import kotlinx.coroutines.runBlocking
 
 val dummyWeather = WeatherResponse(
     location = Location(
@@ -80,6 +82,10 @@ val dummyWeather = WeatherResponse(
 
 @Composable
 fun HomePage() {
+    val weather = WeatherAPI()
+
+    var weatherInfo by remember { mutableStateOf(dummyWeather) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,12 +95,19 @@ fun HomePage() {
             query = "Curtici",
             onSearch = { city ->
                 // Trigger your Ktor API call here
+                runBlocking {
+                    try {
+                        weatherInfo = weather.getWeatherAt(city)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
                 println("Searching for: $city")
             }
         )
 
         // Your amazing card from before
-        WeatherSummaryCard(data = dummyWeather)
+        WeatherSummaryCard(data = weatherInfo)
     }
 }
 
