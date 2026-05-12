@@ -23,23 +23,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.data.services.SettingsManager
-import dev.alinborcea.kcloud.domain.models.UserSettings
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun HomePage() {
-    val weather = WeatherAPI()
-    val settingsManager = remember { SettingsManager() }
-
-    var weatherInfo by remember { mutableStateOf(WeatherResponse()) }
-    var forecast by remember { mutableStateOf(WeatherResponse()) }
-
+fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Forecast", "Settings")
     val icons = listOf(Icons.Default.Home, Icons.Default.Cloud, Icons.Default.Settings)
 
+    var forecast by remember { mutableStateOf(WeatherResponse()) }
     var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
+    var weatherInfo by remember { mutableStateOf(updatedWeatherResponse(weather, userSettings.favoriteLocation)) }
 
     Scaffold(bottomBar = {
         NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
@@ -84,9 +79,22 @@ fun HomePage() {
                     onSettingsChanged = { updated ->
                         userSettings = updated
                         settingsManager.saveSettings(updated)
+                        weatherInfo = updatedWeatherResponse(weather, userSettings.favoriteLocation)
                     }
                 )
             }
         }
     }
+}
+
+fun updatedWeatherResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
+    var weatherResponse = WeatherResponse()
+    runBlocking {
+        try {
+            weatherResponse = weatherAPI.getWeatherAt(location)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    return weatherResponse
 }
