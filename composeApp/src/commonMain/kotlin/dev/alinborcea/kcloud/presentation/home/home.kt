@@ -2,9 +2,22 @@ package dev.alinborcea.kcloud.presentation.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialogDefaults.containerColor
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,27 +33,47 @@ fun HomePage() {
     var weatherInfo by remember { mutableStateOf(WeatherResponse()) }
     var forecast by remember { mutableStateOf(WeatherResponse()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-    ) {
-        WeatherSearchBar(
-            query = "",
-            onSearch = { city ->
-                runBlocking {
-                    try {
-                        weatherInfo = weather.getWeatherAt(city)
-                        forecast = weather.getWeatherForecast(city, 4)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                println("Searching for: $city")
-            }
-        )
+    var selectedItem by remember { mutableIntStateOf(0) }
+    val items = listOf("Home", "Forecast", "Settings")
+    val icons = listOf(Icons.Default.Home, Icons.Default.Cloud, Icons.Default.Settings)
 
-        WeatherSummaryCard(data = weatherInfo)
-        ForecastSection(forecast.forecast.forecastDay)
+    Scaffold(bottomBar = {
+        NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    icon = { Icon(icons[index], contentDescription = item) },
+                    label = { Text(item) },
+                    selected = selectedItem == index,
+                    onClick = { selectedItem = index }
+                )
+            }
+        }
+    }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .statusBarsPadding()
+        ) {
+            WeatherSearchBar(
+                query = "",
+                onSearch = { city ->
+                    runBlocking {
+                        try {
+                            weatherInfo = weather.getWeatherAt(city)
+                            forecast = weather.getWeatherForecast(city, 4)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    println("Searching for: $city")
+                }
+            )
+
+            WeatherSummaryCard(data = weatherInfo)
+            ForecastSection(forecast.forecast.forecastDay)
+        }
     }
+
+
 }
