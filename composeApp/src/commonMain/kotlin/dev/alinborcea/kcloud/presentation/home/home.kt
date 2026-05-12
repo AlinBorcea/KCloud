@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -55,23 +54,28 @@ fun HomePage() {
                 .padding(innerPadding)
                 .statusBarsPadding()
         ) {
-            WeatherSearchBar(
-                query = "",
-                onSearch = { city ->
-                    runBlocking {
-                        try {
-                            weatherInfo = weather.getWeatherAt(city)
-                            forecast = weather.getWeatherForecast(city, 4)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+            if (selectedItem == 0) {
+                WeatherSearchBar(
+                    query = "",
+                    onSearch = { city ->
+                        runBlocking {
+                            try {
+                                weatherInfo = weather.getWeatherAt(city)
+                                forecast = weather.getWeatherForecast(city, 4)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
+                        println("Searching for: $city")
                     }
-                    println("Searching for: $city")
-                }
-            )
+                )
 
-            WeatherSummaryCard(data = weatherInfo)
-            ForecastSection(forecast.forecast.forecastDay)
+                WeatherSummaryCard(data = weatherInfo)
+                ForecastSection(forecast.forecast.forecastDay)
+
+            } else if (selectedItem == 2) {
+                Settings()
+            }
         }
     }
 
