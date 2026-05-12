@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
+import dev.alinborcea.kcloud.data.services.SettingsManager
 import dev.alinborcea.kcloud.domain.models.UserSettings
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
@@ -29,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun HomePage() {
     val weather = WeatherAPI()
+    val settingsManager = remember { SettingsManager() }
 
     var weatherInfo by remember { mutableStateOf(WeatherResponse()) }
     var forecast by remember { mutableStateOf(WeatherResponse()) }
@@ -36,6 +38,8 @@ fun HomePage() {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Forecast", "Settings")
     val icons = listOf(Icons.Default.Home, Icons.Default.Cloud, Icons.Default.Settings)
+
+    var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
 
     Scaffold(bottomBar = {
         NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
@@ -57,7 +61,7 @@ fun HomePage() {
         ) {
             if (selectedItem == 0) {
                 WeatherSearchBar(
-                    query = "",
+                    query = userSettings.favoriteLocation,
                     onSearch = { city ->
                         runBlocking {
                             try {
@@ -75,10 +79,14 @@ fun HomePage() {
                 ForecastSection(forecast.forecast.forecastDay)
 
             } else if (selectedItem == 2) {
-                SettingsScreen(settings = UserSettings())
+                SettingsScreen(
+                    settings = userSettings,
+                    onSettingsChanged = { updated ->
+                        userSettings = updated
+                        settingsManager.saveSettings(updated)
+                    }
+                )
             }
         }
     }
-
-
 }

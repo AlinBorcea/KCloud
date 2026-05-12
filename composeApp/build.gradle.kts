@@ -48,6 +48,12 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
             implementation(compose.materialIconsExtended)
+            implementation("com.russhwolf:multiplatform-settings:1.3.0")
+            // Optional: For Coroutines support (Flows)
+            implementation("com.russhwolf:multiplatform-settings-coroutines:1.3.0")
+            // Optional: To create settings without platform-specific code
+            implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
+            implementation("com.russhwolf:multiplatform-settings-serialization:1.3.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

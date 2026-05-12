@@ -31,6 +31,7 @@ import dev.alinborcea.kcloud.domain.models.UserSettings
 @Composable
 fun SettingsScreen(
     settings: UserSettings,
+    onSettingsChanged: (UserSettings) -> Unit
 ) {
     var location by remember { mutableStateOf(settings.favoriteLocation) }
     var useMetric by remember { mutableStateOf(settings.useMetric) }
@@ -51,8 +52,10 @@ fun SettingsScreen(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(text = "Favorite Location", style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
+                value = settings.favoriteLocation,
+                onValueChange = {
+                    onSettingsChanged(settings.copy(favoriteLocation = it))
+                },
                 placeholder = { Text("e.g. Tokyo, JP") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -71,23 +74,19 @@ fun SettingsScreen(
                 // Metric Option
                 UnitOption(
                     label = "Metric (°C, km/h)",
-                    selected = useMetric,
-                    onClick = { useMetric = true },
+                    selected = settings.useMetric,
+                    onClick = { onSettingsChanged(settings.copy(useMetric = true)) },
                     modifier = Modifier.weight(1f)
                 )
                 // Imperial Option
                 UnitOption(
                     label = "Imperial (°F, mph)",
-                    selected = !useMetric,
-                    onClick = { useMetric = false },
+                    selected = !settings.useMetric,
+                    onClick = { onSettingsChanged(settings.copy(useMetric = false)) },
                     modifier = Modifier.weight(1f)
                 )
             }
         }
-
-        Button(onClick = {
-            print("Save settings!")
-        }) { Text("Save") }
     }
 }
 
