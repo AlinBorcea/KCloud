@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.alinborcea.kcloud.domain.models.ForecastDay
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun ForecastSection(forecastDays: List<ForecastDay>) {
@@ -61,7 +63,7 @@ fun ForecastItem(forecastDay: ForecastDay) {
         ) {
             // Helper to get day name (e.g., "Mon") from "2023-10-25"
             Text(
-                text = forecastDay.date.takeLast(5), // Simple slice for now
+                text = getDayName(forecastDay.date), // Simple slice for now
                 style = MaterialTheme.typography.labelMedium
             )
 
@@ -89,4 +91,25 @@ fun ForecastItem(forecastDay: ForecastDay) {
             )
         }
     }
+}
+
+fun getDayName(dateString: String): String {
+    // 1. Parse the ISO-8601 string (YYYY-MM-DD)
+    val date = LocalDate.parse(dateString)
+
+    // 2. Get the DayOfWeek enum
+    val dayOfWeek: DayOfWeek = date.dayOfWeek
+
+    // 3. Return the name (e.g., "WEDNESDAY")
+    // Use .name.lowercase().replaceFirstChar { it.uppercase() } for "Wednesday"
+    val dayMap: Map<String, String> = mapOf(
+        "MONDAY" to "Mon",
+        "TUESDAY" to "Tue",
+        "WEDNESDAY" to "Wed",
+        "THURSDAY" to "Thu",
+        "FRIDAY" to "Fri",
+        "SATURDAY" to "Sat",
+        "SUNDAY" to "Sun"
+    )
+    return dayMap[dayOfWeek.name] ?: ""
 }
