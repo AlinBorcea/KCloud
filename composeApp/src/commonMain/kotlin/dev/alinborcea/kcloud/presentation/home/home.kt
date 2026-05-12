@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,8 +30,8 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
     var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Forecast", "Settings")
-    val icons = listOf(Icons.Default.Home, Icons.Default.Cloud, Icons.Default.Settings)
+    val items = listOf("Home", "Questions", "Settings")
+    val icons = listOf(Icons.Default.Home, Icons.Default.QuestionAnswer, Icons.Default.Settings)
 
     var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
     var weatherInfo by remember {
