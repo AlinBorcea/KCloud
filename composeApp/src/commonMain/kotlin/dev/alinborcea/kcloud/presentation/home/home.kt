@@ -78,8 +78,8 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                     }
                 )
 
-                WeatherSummaryCard(data = weatherInfo)
-                ForecastSection(forecast.forecast.forecastDay)
+                WeatherSummaryCard(data = weatherInfo, userSettings = userSettings)
+                ForecastSection(forecast.forecast.forecastDay, userSettings = userSettings)
 
             } else if (selectedItem == 2) {
                 SettingsScreen(

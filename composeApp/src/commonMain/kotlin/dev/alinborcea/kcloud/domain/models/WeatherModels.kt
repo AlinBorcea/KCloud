@@ -26,7 +26,13 @@ data class Day(
     @SerialName("maxtemp_c") val maxTempC: Double = 0.0,
     @SerialName("mintemp_c") val minTempC: Double = 0.0,
     val condition: Condition = Condition()
-)
+) {
+    fun maxTemp(useMetric: Boolean): Int =
+        if (useMetric) maxTempC.toInt() else (maxTempC * 1.8 + 32).toInt()
+
+    fun minTemp(useMetric: Boolean): Int =
+        if (useMetric) minTempC.toInt() else (minTempC * 1.8 + 32).toInt()
+}
 
 @Serializable
 data class Location(
@@ -79,7 +85,20 @@ data class Current(
     @SerialName("diff_rad") val diffRad: Double = 0.0,
     val dni: Double = 0.0,
     val gti: Double = 0.0
-)
+) {
+    fun temperature(metric: Boolean): Int = if (metric) tempC.toInt() else tempF.toInt()
+
+    fun feelsLike(metric: Boolean): Int = if (metric) feelslikeC.toInt() else feelslikeF.toInt()
+
+    fun wind(metric: Boolean): Int = if (metric) windKph.toInt() else windMph.toInt()
+
+    fun pressure(metric: Boolean): Int = if (metric) pressureMb.toInt() else pressureIn.toInt()
+
+    fun visibility(metric: Boolean): Int = if (metric) visKm.toInt() else visMiles.toInt()
+
+    fun gust(metric: Boolean): Int = if (metric) gustKph.toInt() else gustMph.toInt()
+
+}
 
 @Serializable
 data class Condition(

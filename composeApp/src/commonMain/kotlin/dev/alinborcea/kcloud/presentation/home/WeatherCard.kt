@@ -38,12 +38,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.alinborcea.kcloud.domain.models.UserSettings
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 
 @Composable
 fun WeatherSummaryCard(
     data: WeatherResponse,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userSettings: UserSettings
 ) {
     var extraInfoExpanded by remember { mutableStateOf(false) }
 
@@ -98,7 +100,7 @@ fun WeatherSummaryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${data.current.tempC.toInt()}°",
+                    text = "${data.current.temperature(userSettings.useMetric)}°",
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontSize = 72.sp,
                         fontWeight = FontWeight.ExtraBold
@@ -114,7 +116,7 @@ fun WeatherSummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Feels like ${data.current.feelslikeC.toInt()}°C",
+                        text = "Feels like ${data.current.feelsLike(userSettings.useMetric)}°${if (userSettings.useMetric) "C" else "F"}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -137,7 +139,7 @@ fun WeatherSummaryCard(
             ) {
                 WeatherDetailItem(
                     label = "Wind",
-                    value = "${data.current.windKph} km/h",
+                    value = "${data.current.wind(userSettings.useMetric)} ${if (userSettings.useMetric) "km/h" else "m/h"}",
                     icon = Icons.Default.Air // If using Material Icons
                 )
                 WeatherDetailItem(
@@ -158,7 +160,7 @@ fun WeatherSummaryCard(
                     ) {
                         WeatherDetailItem(
                             label = "Pressure",
-                            value = "${data.current.pressureMb} hPa",
+                            value = "${data.current.pressure(userSettings.useMetric)} ${if (userSettings.useMetric) "hPa" else "in"}",
                             icon = Icons.Default.Compress
                         )
                         WeatherDetailItem(
@@ -168,7 +170,7 @@ fun WeatherSummaryCard(
                         )
                         WeatherDetailItem(
                             label = "Visibility",
-                            value = "${data.current.visKm} km",
+                            value = "${data.current.visibility(userSettings.useMetric)} ${if (userSettings.useMetric) "km" else "mi"}",
                             icon = Icons.Default.Visibility
                         )
                     }
@@ -192,7 +194,7 @@ fun WeatherSummaryCard(
                         )
                         WeatherDetailItem(
                             label = "Gusts",
-                            value = "${data.current.gustKph} kph",
+                            value = "${data.current.gust(userSettings.useMetric)} ${if (userSettings.useMetric) "kph" else "mph"}",
                             icon = Icons.Default.WindPower
                         )
                     }

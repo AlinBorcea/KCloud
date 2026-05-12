@@ -24,11 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.alinborcea.kcloud.domain.models.ForecastDay
+import dev.alinborcea.kcloud.domain.models.UserSettings
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun ForecastSection(forecastDays: List<ForecastDay>) {
+fun ForecastSection(forecastDays: List<ForecastDay>, userSettings: UserSettings) {
     Column(modifier = Modifier.padding(top = 8.dp)) {
         Text(
             text = "Forecast",
@@ -42,14 +43,14 @@ fun ForecastSection(forecastDays: List<ForecastDay>) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(forecastDays) { day ->
-                ForecastItem(day)
+                ForecastItem(day, userSettings)
             }
         }
     }
 }
 
 @Composable
-fun ForecastItem(forecastDay: ForecastDay) {
+fun ForecastItem(forecastDay: ForecastDay, userSettings: UserSettings) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -80,12 +81,12 @@ fun ForecastItem(forecastDay: ForecastDay) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${forecastDay.day.maxTempC.toInt()}°",
+                text = "${forecastDay.day.maxTemp(userSettings.useMetric)}°",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "${forecastDay.day.minTempC.toInt()}°",
+                text = "${forecastDay.day.minTemp(userSettings.useMetric)}°",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
