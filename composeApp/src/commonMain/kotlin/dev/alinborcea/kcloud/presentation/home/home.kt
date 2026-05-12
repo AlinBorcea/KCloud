@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
+import dev.alinborcea.kcloud.domain.models.UserSettings
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
 
@@ -74,7 +75,7 @@ fun HomePage() {
                 ForecastSection(forecast.forecast.forecastDay)
 
             } else if (selectedItem == 2) {
-                Settings()
+                SettingsScreen(settings = UserSettings())
             }
         }
     }
