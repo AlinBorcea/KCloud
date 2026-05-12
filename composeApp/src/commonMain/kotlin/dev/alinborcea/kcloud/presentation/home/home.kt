@@ -32,9 +32,23 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
     val items = listOf("Home", "Forecast", "Settings")
     val icons = listOf(Icons.Default.Home, Icons.Default.Cloud, Icons.Default.Settings)
 
-    var forecast by remember { mutableStateOf(WeatherResponse()) }
     var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
-    var weatherInfo by remember { mutableStateOf(updatedWeatherResponse(weather, userSettings.favoriteLocation)) }
+    var weatherInfo by remember {
+        mutableStateOf(
+            updatedCurrentWeatherResponse(
+                weather,
+                userSettings.favoriteLocation
+            )
+        )
+    }
+    var forecast by remember {
+        mutableStateOf(
+            updatedWeatherForecastResponse(
+                weather,
+                userSettings.favoriteLocation
+            )
+        )
+    }
 
     Scaffold(bottomBar = {
         NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
@@ -58,15 +72,8 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                 WeatherSearchBar(
                     query = userSettings.favoriteLocation,
                     onSearch = { city ->
-                        runBlocking {
-                            try {
-                                weatherInfo = weather.getWeatherAt(city)
-                                forecast = weather.getWeatherForecast(city, 4)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                        println("Searching for: $city")
+                        weatherInfo = updatedCurrentWeatherResponse(weather, city)
+                        forecast = updatedWeatherForecastResponse(weather, city)
                     }
                 )
 
@@ -79,7 +86,10 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                     onSettingsChanged = { updated ->
                         userSettings = updated
                         settingsManager.saveSettings(updated)
-                        weatherInfo = updatedWeatherResponse(weather, userSettings.favoriteLocation)
+                        weatherInfo =
+                            updatedCurrentWeatherResponse(weather, userSettings.favoriteLocation)
+                        forecast =
+                            updatedWeatherForecastResponse(weather, userSettings.favoriteLocation)
                     }
                 )
             }
@@ -87,11 +97,23 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
     }
 }
 
-fun updatedWeatherResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
+fun updatedCurrentWeatherResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
     var weatherResponse = WeatherResponse()
     runBlocking {
         try {
             weatherResponse = weatherAPI.getWeatherAt(location)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    return weatherResponse
+}
+
+fun updatedWeatherForecastResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
+    var weatherResponse = WeatherResponse()
+    runBlocking {
+        try {
+            weatherResponse = weatherAPI.getWeatherForecast(location, 4)
         } catch (e: Exception) {
             e.printStackTrace()
         }
