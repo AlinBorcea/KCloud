@@ -1,5 +1,6 @@
 package dev.alinborcea.kcloud.presentation.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
@@ -29,7 +31,11 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun ForecastSection(forecastDays: List<ForecastDay>, userSettings: UserSettings) {
+fun ForecastSection(
+    forecastDays: List<ForecastDay>,
+    userSettings: UserSettings,
+    onClickItem: (index: Int) -> Unit
+) {
     Column(modifier = Modifier.padding(top = 8.dp)) {
         Text(
             text = "Forecast",
@@ -42,21 +48,21 @@ fun ForecastSection(forecastDays: List<ForecastDay>, userSettings: UserSettings)
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(forecastDays) { day ->
-                ForecastItem(day, userSettings)
+            itemsIndexed(forecastDays) { index, day ->
+                ForecastItem(day, userSettings, { onClickItem(index) })
             }
         }
     }
 }
 
 @Composable
-fun ForecastItem(forecastDay: ForecastDay, userSettings: UserSettings) {
+fun ForecastItem(forecastDay: ForecastDay, userSettings: UserSettings, onClickItem: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         ),
-        modifier = Modifier.width(100.dp)
+        modifier = Modifier.width(100.dp).clickable { onClickItem() }
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
