@@ -10,6 +10,7 @@ data class WeatherResponse(
     val forecast: Forecast = Forecast()
 )
 
+
 @Serializable
 data class Forecast(
     @SerialName("forecastday") val forecastDay: List<ForecastDay> = emptyList()
@@ -18,7 +19,18 @@ data class Forecast(
 @Serializable
 data class ForecastDay(
     val date: String = "",
-    val day: Day = Day()
+    val day: Day = Day(),
+    val hour: List<Hour> = emptyList()
+)
+
+@Serializable
+data class Hour(
+    @SerialName("time_epoch") val timeEpoch: Long = 0L,
+    val time: String = "", // Format: "2024-05-13 00:00"
+    @SerialName("temp_c") val tempC: Double = 0.0,
+    @SerialName("temp_f") val tempF: Double = 0.0,
+    @SerialName("is_day") val isDay: Int = 0,
+    val condition: Condition = Condition(),
 )
 
 @Serializable
