@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.alinborcea.kcloud.domain.models.Hour
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HourlyForecast(
     hours: List<Hour>,
@@ -36,7 +40,7 @@ fun HourlyForecast(
     onCallBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Row {
+        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = onCallBack,
                 modifier = Modifier
@@ -46,7 +50,12 @@ fun HourlyForecast(
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            Text(dayName, modifier = Modifier.padding(16.dp))
+            Text(
+                dayName,
+                modifier = Modifier.padding(top = 0.dp),
+                style = MaterialTheme.typography.titleLargeEmphasized,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
     LazyColumn(
@@ -66,20 +75,23 @@ fun HourItem(hour: Hour, useMetric: Boolean) {
     val timeDisplay = hour.time.split(" ").lastOrNull() ?: ""
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(12.dp)
+            .fillMaxWidth()
             .width(60.dp)
     ) {
-        Text(
-            text = timeDisplay,
-            style = MaterialTheme.typography.labelMedium
-        )
+        Row {
+            Text(
+                text = timeDisplay,
+                style = MaterialTheme.typography.labelLarge
+            )
 
-        Text(hour.condition.text, style = MaterialTheme.typography.bodySmall)
-
+            Text(" - ")
+            Text(hour.condition.text, style = MaterialTheme.typography.bodyMedium)
+        }
         Text(
             text = if (useMetric) "${hour.tempC.toInt()}°C" else "${hour.tempF.toInt()}°F",
             style = MaterialTheme.typography.titleMedium,
