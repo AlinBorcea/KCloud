@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Settings
@@ -24,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.data.services.SettingsManager
+import dev.alinborcea.kcloud.domain.models.Hour
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import kotlinx.coroutines.runBlocking
 
@@ -32,6 +32,8 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Questions", "Settings")
     val icons = listOf(Icons.Default.Home, Icons.Default.QuestionAnswer, Icons.Default.Settings)
+
+    var forecastIndex by remember { mutableIntStateOf(-1) }
 
     var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
     var weatherInfo by remember {
@@ -69,30 +71,68 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                 .padding(innerPadding)
                 .statusBarsPadding()
         ) {
-            if (selectedItem == 0) {
-                WeatherSearchBar(
-                    query = userSettings.favoriteLocation,
-                    onSearch = { city ->
-                        weatherInfo = updatedCurrentWeatherResponse(weather, city)
-                        forecast = updatedWeatherForecastResponse(weather, city)
-                    }
-                )
+            if (forecastIndex == -1) {
+                if (selectedItem == 0) {
+                    WeatherSearchBar(
+                        query = userSettings.favoriteLocation,
+                        onSearch = { city ->
+                            weatherInfo = updatedCurrentWeatherResponse(weather, city)
+                            forecast = updatedWeatherForecastResponse(weather, city)
+                        }
+                    )
 
-                WeatherSummaryCard(data = weatherInfo, userSettings = userSettings)
-                ForecastSection(forecast.forecast.forecastDay, userSettings = userSettings)
+                    WeatherSummaryCard(data = weatherInfo, userSettings = userSettings)
+                    ForecastSection(
+                        forecast.forecast.forecastDay,
+                        userSettings = userSettings,
+                        onClickItem = { forecastIndex = it })
 
-            } else if (selectedItem == 2) {
-                SettingsScreen(
-                    settings = userSettings,
-                    onSettingsChanged = { updated ->
-                        userSettings = updated
-                        settingsManager.saveSettings(updated)
-                        weatherInfo =
-                            updatedCurrentWeatherResponse(weather, userSettings.favoriteLocation)
-                        forecast =
-                            updatedWeatherForecastResponse(weather, userSettings.favoriteLocation)
+                } else if (selectedItem == 2) {
+                    SettingsScreen(
+                        settings = userSettings,
+                        onSettingsChanged = { updated ->
+                            userSettings = updated
+                            settingsManager.saveSettings(updated)
+                            weatherInfo =
+                                updatedCurrentWeatherResponse(
+                                    weather,
+                                    userSettings.favoriteLocation
+                                )
+                            forecast =
+                                updatedWeatherForecastResponse(
+                                    weather,
+                                    userSettings.favoriteLocation
+                                )
+                        }
+                    )
+                }
+            } else {
+                if (forecast.forecast.forecastDay.size != 4) {
+                    Text("No items here!")
+                } else {
+
+                    val hours = when (forecastIndex) {
+                        0 -> forecast.forecast.forecastDay[0].hour
+                        1 -> forecast.forecast.forecastDay[1].hour
+                        2 -> forecast.forecast.forecastDay[2].hour
+                        3 -> forecast.forecast.forecastDay[3].hour
+                        else -> forecast.forecast.forecastDay[0].hour
                     }
-                )
+
+                    val dayName = when (forecastIndex) {
+                        0 -> forecast.forecast.forecastDay[0].date
+                        1 -> forecast.forecast.forecastDay[1].date
+                        2 -> forecast.forecast.forecastDay[2].date
+                        3 -> forecast.forecast.forecastDay[3].date
+                        else -> forecast.forecast.forecastDay[0].date
+                    }
+
+                    HourlyForecast(
+                        hours,
+                        userSettings.useMetric,
+                        getDayName(dayName),
+                        onCallBack = { forecastIndex = -1 })
+                }
             }
         }
     }
