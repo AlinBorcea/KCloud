@@ -87,6 +87,9 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                         userSettings = userSettings,
                         onClickItem = { forecastIndex = it })
 
+                } else if (selectedItem == 1) {
+                    Chatbot(userSettings.favoriteLocation)
+
                 } else if (selectedItem == 2) {
                     SettingsScreen(
                         settings = userSettings,
