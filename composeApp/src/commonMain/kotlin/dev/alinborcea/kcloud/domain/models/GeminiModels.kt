@@ -17,5 +17,5 @@ data class Error(val message: String = "")
 @Serializable
 data class GenerateContentResponse(val error: Error? = null, val candidates: List<Candidate>? = null)
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class GenerateContentRequest(val contents: Content)

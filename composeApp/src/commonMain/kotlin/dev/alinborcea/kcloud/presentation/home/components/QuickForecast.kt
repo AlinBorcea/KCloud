@@ -48,7 +48,7 @@ fun QuickForecast(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(forecastDays) { index, day ->
-                ForecastItem(day, userSettings, { onClickItem(index) })
+                ForecastItem(day, userSettings) { onClickItem(index) }
             }
         }
     }
