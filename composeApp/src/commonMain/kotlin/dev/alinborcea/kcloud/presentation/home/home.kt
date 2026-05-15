@@ -110,7 +110,7 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                     )
                 }
             } else {
-                if (forecast.forecast.forecastDay.size != 4) {
+                if (forecast.forecast.forecastDay.size != 3) {
                     Text("No items here!")
                 } else {
 
@@ -118,7 +118,6 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                         0 -> forecast.forecast.forecastDay[0].hour
                         1 -> forecast.forecast.forecastDay[1].hour
                         2 -> forecast.forecast.forecastDay[2].hour
-                        3 -> forecast.forecast.forecastDay[3].hour
                         else -> forecast.forecast.forecastDay[0].hour
                     }
 
@@ -126,7 +125,6 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                         0 -> forecast.forecast.forecastDay[0].date
                         1 -> forecast.forecast.forecastDay[1].date
                         2 -> forecast.forecast.forecastDay[2].date
-                        3 -> forecast.forecast.forecastDay[3].date
                         else -> forecast.forecast.forecastDay[0].date
                     }
 
@@ -157,7 +155,7 @@ fun updatedWeatherForecastResponse(weatherAPI: WeatherAPI, location: String): We
     var weatherResponse = WeatherResponse()
     runBlocking {
         try {
-            weatherResponse = weatherAPI.getWeatherForecast(location, 4)
+            weatherResponse = weatherAPI.getWeatherForecast(location, 3)
         } catch (e: Exception) {
             e.printStackTrace()
         }
