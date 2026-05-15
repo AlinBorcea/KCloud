@@ -6,14 +6,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.data.services.SettingsManager
 import dev.alinborcea.kcloud.presentation.home.Home
+import dev.alinborcea.kcloud.presentation.home.HomeViewModel
 
 @Composable
 @Preview
 fun App() {
-    val weather = WeatherAPI()
-    val settingsManager = remember { SettingsManager() }
-
     MaterialTheme {
-        Home(weather = weather, settingsManager = settingsManager)
+        Home(HomeViewModel(WeatherAPI(), SettingsManager()))
     }
 }

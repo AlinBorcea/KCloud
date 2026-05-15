@@ -21,9 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import dev.alinborcea.kcloud.data.repositories.WeatherAPI
-import dev.alinborcea.kcloud.data.services.SettingsManager
-import dev.alinborcea.kcloud.domain.models.WeatherResponse
 import dev.alinborcea.kcloud.presentation.home.components.QuickForecast
 import dev.alinborcea.kcloud.presentation.home.components.SearchBar
 import dev.alinborcea.kcloud.presentation.home.components.WeatherCard
@@ -31,42 +28,36 @@ import dev.alinborcea.kcloud.presentation.home.components.getDayName
 import dev.alinborcea.kcloud.presentation.home.sections.Chatbot
 import dev.alinborcea.kcloud.presentation.home.sections.HourlyForecast
 import dev.alinborcea.kcloud.presentation.home.sections.Settings
-import kotlinx.coroutines.runBlocking
 
 @Composable
-fun Home(weather: WeatherAPI, settingsManager: SettingsManager) {
-    var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Questions", "Settings")
-    val icons = listOf(Icons.Default.Home, Icons.Default.QuestionAnswer, Icons.Default.Settings)
+fun Home(viewModel: HomeViewModel) {
+    var selectedSection by remember { mutableIntStateOf(0) }
+    val sectionNames = listOf("Home", "Questions", "Settings")
+    val sectionIcons =
+        listOf(Icons.Default.Home, Icons.Default.QuestionAnswer, Icons.Default.Settings)
 
-    var forecastIndex by remember { mutableIntStateOf(-1) }
+    var forecastDayIndex by remember { mutableIntStateOf(-1) }
 
-    var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
+    var userSettings by remember { mutableStateOf(viewModel.loadSettings()) }
     var weatherInfo by remember {
         mutableStateOf(
-            updatedCurrentWeatherResponse(
-                weather,
-                userSettings.favoriteLocation
-            )
+            viewModel.updatedCurrentWeatherResponse(userSettings.favoriteLocation)
         )
     }
     var forecast by remember {
         mutableStateOf(
-            updatedWeatherForecastResponse(
-                weather,
-                userSettings.favoriteLocation
-            )
+            viewModel.updatedWeatherForecastResponse(userSettings.favoriteLocation)
         )
     }
 
     Scaffold(bottomBar = {
         NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
-            items.forEachIndexed { index, item ->
+            sectionNames.forEachIndexed { index, item ->
                 NavigationBarItem(
-                    icon = { Icon(icons[index], contentDescription = item) },
+                    icon = { Icon(sectionIcons[index], contentDescription = item) },
                     label = { Text(item) },
-                    selected = selectedItem == index,
-                    onClick = { selectedItem = index }
+                    selected = selectedSection == index,
+                    onClick = { selectedSection = index }
                 )
             }
         }
@@ -77,57 +68,55 @@ fun Home(weather: WeatherAPI, settingsManager: SettingsManager) {
                 .padding(innerPadding)
                 .statusBarsPadding()
         ) {
-            if (forecastIndex == -1) {
-                if (selectedItem == 0) {
-                    SearchBar(
-                        query = userSettings.favoriteLocation,
-                        onSearch = { city ->
-                            weatherInfo = updatedCurrentWeatherResponse(weather, city)
-                            forecast = updatedWeatherForecastResponse(weather, city)
-                        }
-                    )
+            if (forecastDayIndex == -1) {
+                when (selectedSection) {
+                    0 -> {
+                        SearchBar(
+                            query = userSettings.favoriteLocation,
+                            onSearch = { city ->
+                                weatherInfo = viewModel.updatedCurrentWeatherResponse(city)
+                                forecast = viewModel.updatedWeatherForecastResponse(city)
+                            }
+                        )
 
-                    WeatherCard(data = weatherInfo, userSettings = userSettings)
-                    QuickForecast(
-                        forecast.forecast.forecastDay,
-                        userSettings = userSettings,
-                        onClickItem = { forecastIndex = it })
+                        WeatherCard(data = weatherInfo, userSettings = userSettings)
+                        QuickForecast(
+                            forecast.forecast.forecastDay,
+                            userSettings = userSettings,
+                            onClickItem = { forecastDayIndex = it })
 
-                } else if (selectedItem == 1) {
-                    Chatbot(userSettings.favoriteLocation)
+                    }
+                    1 -> {
+                        Chatbot(userSettings.favoriteLocation)
 
-                } else if (selectedItem == 2) {
-                    Settings(
-                        settings = userSettings,
-                        onSettingsChanged = { updated ->
-                            userSettings = updated
-                            settingsManager.saveSettings(updated)
-                            weatherInfo =
-                                updatedCurrentWeatherResponse(
-                                    weather,
-                                    userSettings.favoriteLocation
-                                )
-                            forecast =
-                                updatedWeatherForecastResponse(
-                                    weather,
-                                    userSettings.favoriteLocation
-                                )
-                        }
-                    )
+                    }
+                    2 -> {
+                        Settings(
+                            settings = userSettings,
+                            onSettingsChanged = { updated ->
+                                userSettings = updated
+                                viewModel.saveSettings(updated)
+                                weatherInfo =
+                                    viewModel.updatedCurrentWeatherResponse(userSettings.favoriteLocation)
+                                forecast =
+                                    viewModel.updatedWeatherForecastResponse(userSettings.favoriteLocation)
+                            }
+                        )
+                    }
                 }
             } else {
                 if (forecast.forecast.forecastDay.size != 3) {
                     Text("No items here!")
                 } else {
 
-                    val hours = when (forecastIndex) {
+                    val hours = when (forecastDayIndex) {
                         0 -> forecast.forecast.forecastDay[0].hour
                         1 -> forecast.forecast.forecastDay[1].hour
                         2 -> forecast.forecast.forecastDay[2].hour
                         else -> forecast.forecast.forecastDay[0].hour
                     }
 
-                    val dayName = when (forecastIndex) {
+                    val dayName = when (forecastDayIndex) {
                         0 -> forecast.forecast.forecastDay[0].date
                         1 -> forecast.forecast.forecastDay[1].date
                         2 -> forecast.forecast.forecastDay[2].date
@@ -138,33 +127,9 @@ fun Home(weather: WeatherAPI, settingsManager: SettingsManager) {
                         hours,
                         userSettings.useMetric,
                         getDayName(dayName),
-                        onCallBack = { forecastIndex = -1 })
+                        onCallBack = { forecastDayIndex = -1 })
                 }
             }
         }
     }
-}
-
-fun updatedCurrentWeatherResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
-    var weatherResponse = WeatherResponse()
-    runBlocking {
-        try {
-            weatherResponse = weatherAPI.getWeatherAt(location)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-    return weatherResponse
-}
-
-fun updatedWeatherForecastResponse(weatherAPI: WeatherAPI, location: String): WeatherResponse {
-    var weatherResponse = WeatherResponse()
-    runBlocking {
-        try {
-            weatherResponse = weatherAPI.getWeatherForecast(location, 3)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-    return weatherResponse
 }
