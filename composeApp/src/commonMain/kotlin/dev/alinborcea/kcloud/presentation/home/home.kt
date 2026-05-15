@@ -23,12 +23,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.alinborcea.kcloud.data.repositories.WeatherAPI
 import dev.alinborcea.kcloud.data.services.SettingsManager
-import dev.alinborcea.kcloud.domain.models.Hour
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
+import dev.alinborcea.kcloud.presentation.home.components.QuickForecast
+import dev.alinborcea.kcloud.presentation.home.components.SearchBar
+import dev.alinborcea.kcloud.presentation.home.components.WeatherCard
+import dev.alinborcea.kcloud.presentation.home.components.getDayName
+import dev.alinborcea.kcloud.presentation.home.sections.Chatbot
+import dev.alinborcea.kcloud.presentation.home.sections.HourlyForecast
+import dev.alinborcea.kcloud.presentation.home.sections.Settings
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
+fun Home(weather: WeatherAPI, settingsManager: SettingsManager) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Questions", "Settings")
     val icons = listOf(Icons.Default.Home, Icons.Default.QuestionAnswer, Icons.Default.Settings)
@@ -73,7 +79,7 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
         ) {
             if (forecastIndex == -1) {
                 if (selectedItem == 0) {
-                    WeatherSearchBar(
+                    SearchBar(
                         query = userSettings.favoriteLocation,
                         onSearch = { city ->
                             weatherInfo = updatedCurrentWeatherResponse(weather, city)
@@ -81,8 +87,8 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                         }
                     )
 
-                    WeatherSummaryCard(data = weatherInfo, userSettings = userSettings)
-                    ForecastSection(
+                    WeatherCard(data = weatherInfo, userSettings = userSettings)
+                    QuickForecast(
                         forecast.forecast.forecastDay,
                         userSettings = userSettings,
                         onClickItem = { forecastIndex = it })
@@ -91,7 +97,7 @@ fun HomePage(weather: WeatherAPI, settingsManager: SettingsManager) {
                     Chatbot(userSettings.favoriteLocation)
 
                 } else if (selectedItem == 2) {
-                    SettingsScreen(
+                    Settings(
                         settings = userSettings,
                         onSettingsChanged = { updated ->
                             userSettings = updated

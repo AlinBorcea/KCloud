@@ -1,4 +1,4 @@
-package dev.alinborcea.kcloud.presentation.home
+package dev.alinborcea.kcloud.presentation.home.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeatherSearchBar(
+fun SearchBar(
     query: String,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier

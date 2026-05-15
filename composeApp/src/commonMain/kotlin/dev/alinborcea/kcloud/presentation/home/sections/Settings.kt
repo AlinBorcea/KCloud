@@ -1,4 +1,4 @@
-package dev.alinborcea.kcloud.presentation.home
+package dev.alinborcea.kcloud.presentation.home.sections
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -29,7 +28,7 @@ import dev.alinborcea.kcloud.domain.models.UserSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+fun Settings(
     settings: UserSettings,
     onSettingsChanged: (UserSettings) -> Unit
 ) {

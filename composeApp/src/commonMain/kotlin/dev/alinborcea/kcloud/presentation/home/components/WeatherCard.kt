@@ -1,4 +1,4 @@
-package dev.alinborcea.kcloud.presentation.home
+package dev.alinborcea.kcloud.presentation.home.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -42,7 +42,7 @@ import dev.alinborcea.kcloud.domain.models.UserSettings
 import dev.alinborcea.kcloud.domain.models.WeatherResponse
 
 @Composable
-fun WeatherSummaryCard(
+fun WeatherCard(
     data: WeatherResponse,
     modifier: Modifier = Modifier,
     userSettings: UserSettings

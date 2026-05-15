@@ -1,7 +1,6 @@
-package dev.alinborcea.kcloud.presentation.home
+package dev.alinborcea.kcloud.presentation.home.sections
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
