@@ -1,40 +1,33 @@
-This is a Kotlin Multiplatform project targeting Android, Desktop (JVM).
+# KCloud 🌦️
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+KCloud is a sleek, modern weather and climate application built using **Kotlin Multiplatform (KMP)**. It provides users with real-time weather tracking, detailed atmospheric metrics, multi-day forecasts, and an AI-powered climate assistant that gives localized geographical climate insights.
 
-### Build and Run Android Application
+## 📱 Features
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+* **Real-time Weather Data:** Up-to-the-minute tracking of temperature, weather conditions, and localized timestamps.
+* **Detailed Meteorological Metrics:** Expanded views for specialized data points including wind speed, humidity, barometric pressure, UV index, visibility, cloud cover, precipitation chance, and wind gusts.
+* **Multi-Day Forecast:** Quick-glance weather cards showing high/low temperature predictions for upcoming days.
+* **AI Climate Assistant ("Ask AI"):** An integrated conversational feature providing deep-dive geographic and seasonal climate breakdowns.
+* **User Preferences:** Customizable favorite locations and toggle support between Metric (`°C`, `km/h`) and Imperial (`°F`, `mph`) units.
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## 🛠️ Tech Stack
+
+* **Core Logic:** [Kotlin Multiplatform (KMP)](https://kotlinlang.org/docs/multiplatform.html) for shared business logic across platforms.
+* **Weather Data API:** Powered by [WeatherAPI](https://www.weatherapi.com/) to fetch live atmospheric conditions and forecasts.
+* **AI Assistant:** Powered by the [Gemini API](https://ai.google.dev/) to generate context-aware climate summaries based on user location preferences.
+
+## 🚀 Getting Started
+
+### Prerequisites
+Before running or building the project, ensure you have obtained the necessary API keys:
+1. Get a free API key from [WeatherAPI](https://www.weatherapi.com/).
+2. Get an API key from Google AI Studio for the [Gemini API](https://ai.google.dev/).
+
+### Configuration
+Add your API keys to your project's local environment configuration (e.g., `local.properties` or build configuration files depending on your KMP setup):
+
+```properties
+WEATHER_API_KEY="your_weatherapi_key_here"
+GEMINI_API_KEY="your_gemini_api_key_here"
